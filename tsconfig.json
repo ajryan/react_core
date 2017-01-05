@@ -1,13 +1,13 @@
-﻿{
+{
   "compilerOptions": {
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es6",
+    "jsx": "preserve",
     "sourceMap": true,
-    "lib": ["es6", "dom"],
-    "skipDefaultLibCheck" : true
+    "skipDefaultLibCheck": true
   },
   "exclude": [
-    "bin",
-    "node_modules"
-  ] 
+      "bin",
+      "node_modules"
+  ]
 }

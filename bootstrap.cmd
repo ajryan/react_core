@@ -5,7 +5,7 @@ echo ====
 echo dotnet restore
 echo ====
 
-dotnet restore .\vue_core.sln
+dotnet restore
 
 echo.
 echo ====

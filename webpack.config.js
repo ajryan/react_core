@@ -1,37 +1,42 @@
+var isDevBuild = process.argv.indexOf('--env.prod') < 0;
 var path = require('path');
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var merge = require('extendify')({ isDeep: true, arrays: 'concat' });
 
-var isDevelopment = process.env.ASPNETCORE_ENVIRONMENT === 'Development';
-var devConfig = require('./webpack.config.dev');
-var prodConfig = require('./webpack.config.prod');
-
-var extractCSS = new ExtractTextPlugin('site.css');
-
-module.exports = merge({
-    resolve: {
-        extensions: [ '', '.js', '.jsx', '.ts', '.tsx' ]
+var bundleOutputDir = './wwwroot/dist';
+module.exports = {
+    devtool: isDevBuild ? 'inline-source-map' : null,
+    entry: { 'main': './ClientApp/boot.tsx' },
+    resolve: { extensions: [ '', '.js', '.jsx', '.ts', '.tsx' ] },
+    output: {
+        path: path.join(__dirname, bundleOutputDir),
+        filename: '[name].js',
+        publicPath: '/dist/'
     },
     module: {
         loaders: [
-            { test: /\.ts(x?)$/, include: /app/, loader: 'ts-loader?silent=true' },
-            { test:/\.css/, loader: extractCSS.extract(['css-loader']) }
+            { test: /\.ts(x?)$/, include: /ClientApp/, loader: 'babel-loader' },
+            { test: /\.tsx?$/, include: /ClientApp/, loader: 'ts-loader', query: { silent: true } },
+            { test: /\.css$/, loader: isDevBuild ? 'style-loader!css-loader' : ExtractTextPlugin.extract(['css-loader']) },
+            { test: /\.(png|jpg|jpeg|gif|svg)$/, loader: 'url-loader', query: { limit: 25000 } },
+            { test: /\.json$/, loader: 'json-loader' }
         ]
     },
-    entry: {
-        main: ['./app/app.ts']
-    },
-    output: {
-        path: path.join(__dirname, 'wwwroot', 'dist'),
-        filename: '[name].js',
-        publicPath: '/dist'
-    },
     plugins: [
-        extractCSS,
         new webpack.DllReferencePlugin({
             context: __dirname,
             manifest: require('./wwwroot/dist/vendor-manifest.json')
         })
-    ]
-}, isDevelopment ? devConfig : prodConfig);
+    ].concat(isDevBuild ? [
+        // Plugins that apply in development builds only
+        new webpack.SourceMapDevToolPlugin({
+            filename: '[file].map', // Remove this line if you prefer inline source maps
+            moduleFilenameTemplate: path.relative(bundleOutputDir, '[resourcePath]') // Point sourcemap entries to the original file locations on disk
+        })
+    ] : [
+        // Plugins that apply in production builds only
+        new webpack.optimize.OccurenceOrderPlugin(),
+        new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false } }),
+        new ExtractTextPlugin('site.css')
+    ])
+};
