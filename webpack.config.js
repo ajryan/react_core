@@ -4,6 +4,7 @@ var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var bundleOutputDir = './wwwroot/dist';
+
 module.exports = {
     devtool: isDevBuild ? 'inline-source-map' : null,
     entry: { 'main': './ClientApp/boot.tsx' },
