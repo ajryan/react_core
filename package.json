@@ -1,5 +1,5 @@
 {
-  "name": "Vuespa",
+  "name": "vuespa",
   "version": "0.0.0",
   "devDependencies": {
     "@types/history": "^2.0.39",
