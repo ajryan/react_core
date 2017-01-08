@@ -1,2 +1,2 @@
-# vue_core
-ASP.NET Core Vue.js
+# react_core
+ASP.NET Core React
